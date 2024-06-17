@@ -47,7 +47,7 @@ custom:
       - boto3
       - botocore
     stage: ${opt:stage, self:provider.stage}
-    tableName: ${self:custom.stage}-api
+    tableName: ${self:custom.stage}-switch-api
 
 plugins:
   - serverless-python-requirements
