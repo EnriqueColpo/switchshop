@@ -1,8 +1,7 @@
 service: api
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 useDotenv: true
-
 
 provider:
   name: aws
@@ -12,6 +11,21 @@ provider:
   logRetentionInDays: 90
   environment:
     APP_ENVIRONMENT: ${self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+              - dynamodb:Query
+              - dynamodb:Scan
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+          Resource:
+            - "Fn::GetAtt": [APITable, Arn]
+            - "Fn::Join": ["/", ["Fn::GetAtt": [APITable, Arn], "index", "*"]]
 
 functions:
   API:
@@ -26,13 +40,17 @@ functions:
             origin: ${env:ALLOWED_ORIGINS}
             maxAge: 60
 
-
 custom:
   pythonRequirements:
     usePoetry: true
     noDeploy:
-      - boto3  # already on Lambda
-      - botocore  # already on Lambda
+      - boto3
+      - botocore
+    stage: ${opt:stage, self:provider.stage}
+    tableName: ${self:custom.stage}-api
 
 plugins:
   - serverless-python-requirements
+
+resources:
+  - ${file(resources/dynamodb.yml)}
