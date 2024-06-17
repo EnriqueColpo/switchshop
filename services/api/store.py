@@ -11,10 +11,7 @@ class BrandStore:
         self.dynamodb_url = dynamodb_url
 
     def add(self, brand):
-        dynamodb = boto3.resource(
-            "dynamodb",
-            endpoint_url=self.dynamodb_url
-        )
+        dynamodb = boto3.resource("dynamodb", endpoint_url=self.dynamodb_url)
         table = dynamodb.Table(self.table_name)
         table.put_item(
             Item={
@@ -26,10 +23,7 @@ class BrandStore:
         )
 
     def get_by_id(self, brand_id, name):
-        dynamodb = boto3.resource(
-            "dynamodb",
-            endpoint_url=self.dynamodb_url
-        )
+        dynamodb = boto3.resource("dynamodb", endpoint_url=self.dynamodb_url)
         table = dynamodb.Table(self.table_name)
         record = table.get_item(
             Key={
@@ -44,10 +38,7 @@ class BrandStore:
         )
 
     def list_open(self):
-        dynamodb = boto3.resource(
-            "dynamodb",
-            endpoint_url=self.dynamodb_url
-        )
+        dynamodb = boto3.resource("dynamodb", endpoint_url=self.dynamodb_url)
 
         table = dynamodb.Table(self.table_name)
         response = table.scan()
