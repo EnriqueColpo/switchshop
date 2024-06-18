@@ -37,7 +37,7 @@ class BrandStore:
             name=record["Item"]["name"],
         )
 
-    def list_open(self):
+    def list_all(self):
         dynamodb = boto3.resource("dynamodb", endpoint_url=self.dynamodb_url)
 
         table = dynamodb.Table(self.table_name)
