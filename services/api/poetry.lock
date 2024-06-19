@@ -831,19 +831,6 @@ files = [
 ]
 
 [[package]]
-name = "jwt"
-version = "1.3.1"
-description = "JSON Web Token library for Python 3."
-optional = false
-python-versions = ">= 3.6"
-files = [
-    {file = "jwt-1.3.1-py3-none-any.whl", hash = "sha256:61c9170f92e736b530655e75374681d4fcca9cfa8763ab42be57353b2b203494"},
-]
-
-[package.dependencies]
-cryptography = ">=3.1,<3.4.0 || >3.4.0"
-
-[[package]]
 name = "mangum"
 version = "0.17.0"
 description = "AWS Lambda support for ASGI applications"
@@ -2145,4 +2132,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "940446e8de8ba2b4a1528dd7d510fcdc7151e84f73b4c393c3d18b8629ad3d2c"
+content-hash = "9b380c214f8f4e3fce45190ba211760c097e9a11ee0df3104e3c98c3585ed9b0"

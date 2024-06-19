@@ -12,10 +12,10 @@
 
 	const getConfiguration = async () => {
 		const session = await Auth.currentSession()
-
+		const idToken = session.getIdToken()
 		const configuration = {
 			headers: {
-				Authorization: session.getIdToken().getJwtToken()
+				Authorization: idToken.getJwtToken(),
 			}
 		}
 
