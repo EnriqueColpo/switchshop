@@ -14,6 +14,136 @@ Resources:
         HostedZoneConfig
       Name:
         Ref: Domain
+  CloudFrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: "Switch UI"
+  VueAppS3Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Fn::ImportValue: s3-development-switch-bucket-name
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Action: "s3:GetObject"
+            Resource:
+              Fn::Join:
+                - '/'
+                - - Fn::ImportValue: s3-development-switch-bucket-arn
+                  - '*'
+  APICachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 0
+        MaxTTL: 1
+        MinTTL: 0
+        Name: APICachePolicy
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: all
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Authorization
+              - Content-Type
+          QueryStringsConfig:
+            QueryStringBehavior: none
+  VueAppCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 30
+        MaxTTL: 60
+        MinTTL: 0
+        Name: VueAppCachePolicy
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: all
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Content-Type
+          QueryStringsConfig:
+            QueryStringBehavior: none
+  SwitchCloudFront:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName:
+              Fn::Join:
+                - '.'
+                - - Fn::ImportValue: s3-development-switch-bucket-name
+                  - 's3.amazonaws.com'
+            Id: vueApp
+            S3OriginConfig:
+              OriginAccessIdentity:
+                  Fn::Join:
+                      - ''
+                      -
+                        - 'origin-access-identity/cloudfront/'
+                        - Ref: CloudFrontOriginAccessIdentity
+          - DomainName: https://e3gq72bill.execute-api.eu-west-1.amazonaws.com/
+            Id: api
+            OriginPath: /development
+            CustomOriginConfig:
+              HTTPSPort: '443'
+              OriginProtocolPolicy: https-only
+        Enabled: 'true'
+        DefaultRootObject: index.html
+        Aliases:
+          - Ref: Domain
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          TargetOriginId: vueApp
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId:
+            Ref: VueAppCachePolicy
+        CacheBehaviors:
+          - AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+            CachePolicyId:
+              Ref: APICachePolicy
+            PathPattern: api/*
+            TargetOriginId: api
+            ViewerProtocolPolicy: redirect-to-https
+        ViewerCertificate:
+          AcmCertificateArn: arn:aws:acm:us-east-1:794415756724:certificate/8f3790a6-6e68-4d6e-9717-2b579a1a1fdd
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+  CloudFrontDNSRecord:  # new
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt SwitchCloudFront.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2  # See docs for more details https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
+      HostedZoneId:
+        Ref: SwitchHostedZone
+      Name:
+        Ref: Domain
+      Type: A
+
 Outputs:
   HostedZoneId:
     Description: Hosted zone ID
