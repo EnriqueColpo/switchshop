@@ -11,11 +11,11 @@
 	const brands = reactive({ data: [] })
 
 	const getConfiguration = async () => {
-		const { idToken } = await Auth.currentSession()
+		const session = await Auth.currentSession()
 
 		const configuration = {
 			headers: {
-				Authorization: idToken.getJwtToken()
+				Authorization: session.getIdToken().getJwtToken()
 			}
 		}
 
@@ -23,14 +23,8 @@
 	}
 
 	const createBrand = async () => {
-		// const configuration = await getConfiguration()
-		const { idToken } = await Auth.currentSession();
+		const configuration = await getConfiguration()
 
-		const configuration = {
-			headers: {
-				Authorization: idToken.getJwtToken()
-			}
-		}
 		const paylaod = {
 			name: createBrandForm.name
 		}
