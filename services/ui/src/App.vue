@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 	import { Authenticator } from '@aws-amplify/ui-vue';
 	import { reactive, onMounted } from "vue";
 	import { Auth } from 'aws-amplify';
