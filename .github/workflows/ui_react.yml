@@ -34,4 +34,5 @@ jobs:
       - name: Build
         run: npm run build:browser
       - name: Deploy
-        run: npx sls s3deploy --stage development
+        run: sls deploy --stage development --verbose
+        
