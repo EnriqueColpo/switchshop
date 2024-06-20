@@ -31,3 +31,7 @@ jobs:
         run: npm install -g serverless@3.0.0
       - name: Install NPM dependencies
         run: npm install
+      - name: serverless deploy
+        uses: serverless/github-action@v3.1
+        with:
+          args: deploy
