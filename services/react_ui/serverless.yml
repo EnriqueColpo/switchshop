@@ -1,9 +1,7 @@
 ---
 service: switch-ui
-
 frameworkVersion: "3"
 useDotenv: true
-
 variablesResolutionMode: 20210326
 disabledDeprecations:
   - CLI_OPTIONS_SCHEMA # some Serverless plugins haven't been updated yet and generate warnings
@@ -12,12 +10,20 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: ${opt:region, 'us-east-1'}
-  stage: ${opt:stage, 'development'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 6
+  logRetentionInDays: 7
+  lambdaHashingVersion: 20201221 # for upcoming Serverless v3
+
+  apiGateway:
+    shouldStartNameWithService: true # for upcoming Serverless v3
 
   environment:
     SERVERLESS_PROJECT: ${self:service}
     SERVERLESS_REGION: ${self:provider.region}
     SERVERLESS_STAGE: ${self:provider.stage}
+
     APP_DIST_URL: ${self:custom.distBucketUrl.${self:provider.region}, self:custom.distBucketUrl.default}
     APP_PUBLIC_URL: ${self:custom.distBucketUrl.${self:provider.region}, self:custom.distBucketUrl.default}
     APIGATEWAY_URL:
@@ -66,6 +72,12 @@ custom:
           - Ref: AWS::Region
           - .amazonaws.com/
           - Ref: DistBucket
+
+  scripts:
+    hooks:
+      # Build the client-side script before packaging backend code
+      package:initialize: "npm run build:browser"
+      deploy:finalize: "npx sls s3deploy --stage ${self:provider.stage}"
 
   webpack:
     webpackConfig: "webpack.server.config.js"
