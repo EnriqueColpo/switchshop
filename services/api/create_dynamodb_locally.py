@@ -10,6 +10,10 @@ client.create_table(
         {"AttributeName": "SK", "AttributeType": "S"},
         {"AttributeName": "GS1PK", "AttributeType": "S"},
         {"AttributeName": "GS1SK", "AttributeType": "S"},
+        {"AttributeName": "GS2PK", "AttributeType": "S"},
+        {"AttributeName": "GS2SK", "AttributeType": "S"},
+        {"AttributeName": "GS3PK", "AttributeType": "S"},
+        {"AttributeName": "GS3SK", "AttributeType": "S"},
     ],
     TableName=table_name,
     KeySchema=[
@@ -23,6 +27,26 @@ client.create_table(
             "KeySchema": [
                 {"AttributeName": "GS1PK", "KeyType": "HASH"},
                 {"AttributeName": "GS1SK", "KeyType": "RANGE"},
+            ],
+            "Projection": {
+                "ProjectionType": "ALL",
+            },
+        },
+        {
+            "IndexName": "GS2",
+            "KeySchema": [
+                {"AttributeName": "GS2PK", "KeyType": "HASH"},
+                {"AttributeName": "GS2SK", "KeyType": "RANGE"},
+            ],
+            "Projection": {
+                "ProjectionType": "ALL",
+            },
+        },
+        {
+            "IndexName": "GS3",
+            "KeySchema": [
+                {"AttributeName": "GS3PK", "KeyType": "HASH"},
+                {"AttributeName": "GS3SK", "KeyType": "RANGE"},
             ],
             "Projection": {
                 "ProjectionType": "ALL",

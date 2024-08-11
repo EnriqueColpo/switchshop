@@ -1,4 +1,3 @@
-import uuid
 from typing import Union
 
 import jwt
@@ -8,9 +7,15 @@ from mangum import Mangum
 from starlette import status
 
 from config import Config
-from models import Brand
-from schemas import APIBrand, APIBrandList, CreateBrand
-from store import BrandStore
+from models import ProductInventory
+from schemas import (
+    ProductInventorySchema,
+    CreateProductInventorySchema,
+    ProductInventoryListSchema,
+    ProductInventoryResponseSchema
+)
+from stores.product_inventory_store import ProductInventoryStore
+
 
 app = FastAPI()
 
@@ -27,13 +32,13 @@ app.add_middleware(
 config = Config()
 
 
-def get_brand_store():
-    return BrandStore(config.TABLE_NAME, config.DYNAMODB_URL)
+def get_product_inventory_store():
+    return ProductInventoryStore(config.TABLE_NAME, config.DYNAMODB_URL)
 
 
-def get_user_email(authorization: Union[str, None] = Header(default=None)) -> str:
-    print(authorization)
-    user_object = jwt.decode(authorization, options={"verify_signature": False})
+def get_user_email(Authorization: Union[bytes, None] = Header(default=None)) -> str:
+    print(Authorization)
+    user_object = jwt.decode(Authorization, options={"verify_signature": False})
     return user_object["cognito:username"]
 
 
@@ -41,26 +46,57 @@ def get_user_email(authorization: Union[str, None] = Header(default=None)) -> st
 def health_check():
     return {"message": "OK"}
 
-
-@app.post("/api/brands/", response_model=APIBrand, status_code=status.HTTP_201_CREATED)
-def create_brand(
-    parameters: CreateBrand,
+@app.post(
+    "/api/product_inventory/",
+    response_model=ProductInventorySchema,
+    status_code=status.HTTP_201_CREATED
+)
+def create_product_inventory(
+    parameters: CreateProductInventorySchema,
     user_email: str = Depends(get_user_email),
-    brand_store: BrandStore = Depends(get_brand_store),
+    product_inventory_store: ProductInventoryStore = Depends(get_product_inventory_store),
 ):
-    brand = Brand.create(uuid.uuid4(), parameters.name)
-    brand_store.add(brand)
-    return brand
+    product_inventory = ProductInventory.create(
+        parameters.product_name,
+        parameters.location_id,
+        parameters.category_name,
+        parameters.brand_name,
+        parameters.description,
+        parameters.price,
+        parameters.total_stock_quantity,
+        parameters.last_restock_date,
+        parameters.inventory
+    )
+    product_inventory_store.add(product_inventory)
+    return product_inventory
 
-
-@app.get("/api/brands/", response_model=APIBrandList)
-def get_brands(
+@app.get(
+    "/api/product_inventory/{product_inventory_id}/{location_id}",
+    response_model=ProductInventoryResponseSchema
+)
+def get_product_inventory(
+    product_inventory_id: str,
+    location_id: str,
     user_email: str = Depends(get_user_email),
-    brand_store: BrandStore = Depends(get_brand_store),
+    product_inventory_store: ProductInventoryStore = Depends(get_product_inventory_store),
 ):
-    response = brand_store.list_all()
-    response = [brand.__dict__ for brand in response]
-    return APIBrandList(results=response)
+    response = product_inventory_store.get_by_id(product_inventory_id, location_id)
+    response = ProductInventoryResponseSchema(result=response.__dict__)
+    print(response)
+    return response
 
+
+@app.get(
+    "/api/product_inventory/",
+    response_model=ProductInventoryListSchema
+)
+def get_product_inventory_list(
+    category_name: str = None,
+    brand_name: str = None,
+    user_email: str = Depends(get_user_email),
+    product_inventory_store: ProductInventoryStore = Depends(get_product_inventory_store),
+):
+    response = product_inventory_store.filter(category_name, brand_name)
+    return ProductInventoryListSchema(results=response)
 
 handle = Mangum(app)
