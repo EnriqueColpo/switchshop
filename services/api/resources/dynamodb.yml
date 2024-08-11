@@ -13,6 +13,14 @@ Resources:
           AttributeType: S
         - AttributeName: GS1SK
           AttributeType: S
+        - AttributeName: GS2PK
+          AttributeType: S
+        - AttributeName: GS2SK
+          AttributeType: S
+        - AttributeName: GS3PK
+          AttributeType: S
+        - AttributeName: GS3SK
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
@@ -24,6 +32,22 @@ Resources:
             - AttributeName: GS1PK
               KeyType: HASH
             - AttributeName: GS1SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: GS2
+          KeySchema:
+            - AttributeName: GS2PK
+              KeyType: HASH
+            - AttributeName: GS2SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: GS3
+          KeySchema:
+            - AttributeName: GS3PK
+              KeyType: HASH
+            - AttributeName: GS3SK
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
