@@ -2,18 +2,17 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from models import ProductInventory
 
+
 class ProductInventoryStore:
     def __init__(self, table_name, dynamodb_url=None):
         self.table_name = table_name
         self.dynamodb_url = dynamodb_url
-    
+
     def add(self, product_inventory):
         dynamodb = boto3.resource("dynamodb", endpoint_url=self.dynamodb_url)
         table = dynamodb.Table(self.table_name)
-        table.put_item(
-            Item={**product_inventory.__dict__}
-        )
-    
+        table.put_item(Item={**product_inventory.__dict__})
+
     def get_by_id(self, product_inventory_id, location_id):
         dynamodb = boto3.resource("dynamodb", endpoint_url=self.dynamodb_url)
         table = dynamodb.Table(self.table_name)
@@ -44,7 +43,7 @@ class ProductInventoryStore:
             LastRestockDate=record["Item"]["LastRestockDate"],
             Inventory=record["Item"]["Inventory"],
         )
-    
+
     def filter(self, category_name=None, brand_name=None):
         if category_name:
             response = self.get_by_category(category_name)

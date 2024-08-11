@@ -17,7 +17,9 @@ def product_inventory_store(dynamodb_table):
 
 @pytest.fixture
 def client(product_inventory_store):
-    app.dependency_overrides[get_product_inventory_store] = lambda: product_inventory_store
+    app.dependency_overrides[get_product_inventory_store] = (
+        lambda: product_inventory_store
+    )
     return TestClient(app)
 
 
@@ -117,9 +119,9 @@ def test_create_product_inventory(dynamodb_table):
                 "color": "black",
                 "size": "XL",
                 "quantity": "9",
-                "description": "black like my soul"
+                "description": "black like my soul",
             }
-        ]
+        ],
     )
 
     repository.add(product_inventory)
@@ -128,7 +130,7 @@ def test_create_product_inventory(dynamodb_table):
 
     result = repository.get_by_id(
         product_inventory_id=product_inventory.ProductName,
-        location_id=product_inventory.LocationId
+        location_id=product_inventory.LocationId,
     )
 
     assert result == product_inventory
@@ -149,13 +151,15 @@ def test_create_product_inventory_from_api(client, id_token):
                 "color": "black",
                 "size": "XL",
                 "quantity": "9",
-                "description": "black like my soul"
+                "description": "black like my soul",
             }
-        ]
+        ],
     }
 
     response = client.post(
-        "/api/product_inventory/", json=product_inventory_data, headers={"Authorization": id_token}
+        "/api/product_inventory/",
+        json=product_inventory_data,
+        headers={"Authorization": id_token},
     )
 
     body = response.json()
@@ -183,16 +187,16 @@ def test_get_product_inventory(dynamodb_table):
                 "color": "black",
                 "size": "XL",
                 "quantity": "9",
-                "description": "black like my soul"
+                "description": "black like my soul",
             }
-        ]
+        ],
     )
 
     repository.add(product_inventory)
 
     result = repository.get_by_id(
         product_inventory_id=product_inventory.ProductName,
-        location_id=product_inventory.LocationId
+        location_id=product_inventory.LocationId,
     )
 
     assert result == product_inventory
@@ -213,16 +217,20 @@ def test_get_product_inventory_from_api(client, user_email, id_token):
                 "color": "black",
                 "size": "XL",
                 "quantity": "9",
-                "description": "black like my soul"
+                "description": "black like my soul",
             }
-        ]
+        ],
     }
 
     client.post(
-        "/api/product_inventory/", json=product_inventory_data, headers={"Authorization": id_token}
+        "/api/product_inventory/",
+        json=product_inventory_data,
+        headers={"Authorization": id_token},
     )
 
-    response = client.get("/api/product_inventory/Magazine/switch", headers={"Authorization": id_token})
+    response = client.get(
+        "/api/product_inventory/Magazine/switch", headers={"Authorization": id_token}
+    )
 
     body = response.json()
 

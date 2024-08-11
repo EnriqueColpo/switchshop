@@ -5,7 +5,6 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-
 @dataclass
 class ProductInventory:
     PK: str
@@ -65,5 +64,5 @@ class ProductInventory:
             price,
             total_stock_quantity,
             last_restock_date,
-            inventory
+            inventory,
         )
