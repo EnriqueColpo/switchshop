@@ -8,14 +8,9 @@ from starlette import status
 
 from config import Config
 from models import ProductInventory
-from schemas import (
-    ProductInventorySchema,
-    CreateProductInventorySchema,
-    ProductInventoryListSchema,
-    ProductInventoryResponseSchema,
-)
+from schemas import (CreateProductInventorySchema, ProductInventoryListSchema,
+                     ProductInventoryResponseSchema, ProductInventorySchema)
 from stores.product_inventory_store import ProductInventoryStore
-
 
 app = FastAPI()
 
