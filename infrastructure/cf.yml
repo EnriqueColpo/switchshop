@@ -7,15 +7,129 @@ Parameters:
     AllowedPattern: "(?!-)[a-zA-Z0-9-.]{1,63}(?<!-)"
     ConstraintDescription: must be a valid DNS zone name.
 Resources:
-  TasksHostedZone:
+  SwitchHostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
         HostedZoneConfig
       Name:
         Ref: Domain
-Outputs:
-  HostedZoneId:
-    Description: Hosted zone ID
-    Value:
-      Ref: TasksHostedZone
+  CloudFrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: "Switch UI"
+  VueAppS3Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Fn::ImportValue: s3-development-switch-bucket-name
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Action: "s3:GetObject"
+            Resource:
+              Fn::Join:
+                - '/'
+                - - Fn::ImportValue: s3-development-switch-bucket-arn
+                  - '*'
+  APICachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 0
+        MaxTTL: 1
+        MinTTL: 0
+        Name: APICachePolicy
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: all
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Authorization
+              - Content-Type
+          QueryStringsConfig:
+            QueryStringBehavior: none
+  VueAppCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 30
+        MaxTTL: 60
+        MinTTL: 0
+        Name: VueAppCachePolicy
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: all
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Content-Type
+          QueryStringsConfig:
+            QueryStringBehavior: none
+  SwitchCloudFront:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName:
+              Fn::Join:
+                - '.'
+                - - Fn::ImportValue: s3-development-switch-bucket-name
+                  - 's3.amazonaws.com'
+            Id: vueApp
+            S3OriginConfig:
+              OriginAccessIdentity:
+                  Fn::Join:
+                      - ''
+                      -
+                        - 'origin-access-identity/cloudfront/'
+                        - Ref: CloudFrontOriginAccessIdentity
+          - DomainName: 5vznielb6b.execute-api.eu-west-1.amazonaws.com
+            Id: api
+            OriginPath: /development
+            CustomOriginConfig:
+              HTTPSPort: '443'
+              OriginProtocolPolicy: https-only
+        Enabled: 'true'
+        DefaultRootObject: index.html
+        Aliases:
+          - Ref: Domain
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          TargetOriginId: vueApp
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId:
+            Ref: VueAppCachePolicy
+        CacheBehaviors:
+          - AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+            CachePolicyId:
+              Ref: APICachePolicy
+            PathPattern: api/*
+            TargetOriginId: api
+            ViewerProtocolPolicy: redirect-to-https
+        ViewerCertificate:
+          AcmCertificateArn: arn:aws:acm:us-east-1:794415756724:certificate/d484e541-2c56-41ea-b582-1c17b415b0fd
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+  CloudFrontDNSRecord:  # new
