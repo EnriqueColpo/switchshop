@@ -1,125 +1,71 @@
 <script setup lang="ts">
-	import { Authenticator } from '@aws-amplify/ui-vue';
-	import { reactive, onMounted } from "vue";
-	import { Auth } from 'aws-amplify';
-	import '@aws-amplify/ui-vue/styles.css';
-	import axios from 'axios';
+import { Authenticator } from '@aws-amplify/ui-vue';
+import '@aws-amplify/ui-vue/styles.css';
+import NavigationMenu from './components/NavigationMenu/NavigationMenu.vue'
+import Splitter from './components/Splitter/Splitter.vue'
+import ProductInventoryLayout from './layouts/ProductInventoryLayout.vue';
+import CreateProductInventoryLayout from './layouts/CreateProductInventoryLayout.vue';
+import {ref, computed} from "vue"
 
-	const API_URL = import.meta.env.VITE_VUE_APP_API_URL || 'http://localhost:8000/api';
+const routes: any = {
+	"/": ProductInventoryLayout,
+	"/crear-producto": CreateProductInventoryLayout
+}
 
-	const createBrandForm = reactive({ name: '' })
-	const brands = reactive({ data: [] })
+const currentPath = ref(window.location.hash)
 
-	const getConfiguration = async () => {
-		const session = await Auth.currentSession()
-		const idToken = session.getIdToken()
-		const configuration = {
-			headers: {
-				Authorization: idToken.getJwtToken(),
-			}
-		}
+window.addEventListener('hashchange', () => {
+  currentPath.value = window.location.hash
+})
 
-		return configuration
+const currentView = computed(() => {
+	let _path = currentPath.value
+
+	if (_path !== "/") {
+		_path = currentPath.value.slice(1)
 	}
 
-	const createBrand = async () => {
-		const configuration = await getConfiguration()
-
-		const paylaod = {
-			name: createBrandForm.name
-		}
-
-		await axios.post(
-			`${API_URL}/brands/`,
-			paylaod,
-			configuration
-		)
-
-		createBrandForm.name = ''
-		await fetchBrands()
+	if (Object.keys(routes).includes(_path)) {
+		const route: any = routes[_path]
+		return route
+	} else {
+		return undefined
 	}
-
-	const fetchBrands = async () => {
-		const configuration = await getConfiguration()
-
-		const response = await axios.get(
-			`${API_URL}/brands/`,
-			configuration
-		)
-
-		brands.data = response.data.results
-	}
-
-	onMounted(() => {
-		fetchBrands();
-	})
+})
 
 </script>
 
 <template>
-	<authenticator username-alias="email" :login-mechanisms="['email']">
+	<Authenticator username-alias="email" :login-mechanisms="['email']">
 		<template v-slot="{ signOut }">
-			<el-menu class="el-menu" mode="horizontal" :ellipsis="false">
-				<!-- <div class="flex-grow"/> -->
-				<el-menu-item index="0" @click="signOut">Sign Out</el-menu-item>
-			</el-menu>
-			<br />
+			<NavigationMenu :signOut="signOut"/>
 
-			<el-row>
-				<el-col :span="12" :offset="8">
-					<el-card class="box-card">
-						<el-form :model="createBrandForm" label-width="120px">
-							<el-form-item label="Brand name">
-								<el-input v-model="createBrandForm.name" />
-							</el-form-item>
-							<el-form-item>
-								<el-button type="primary" @click="createBrand">Create</el-button>
-							</el-form-item>
-						</el-form>
-					</el-card>
-				</el-col>
-			</el-row>
-			<br />
-			<el-row>
-				<el-col :span="12" :offset="8">
-					<el-card class="box-card">
-						<template #header>
-							<div class="card-header">
-								<span>Brands</span>
-							</div>
-						</template>
-						<el-table :data="brands.data">
-							<el-table-column prop="name" label="Name" />
-							<el-table-column fixed="right" label="Actions" width="120">
-								<!-- <template #default="scope"> -->
-								<!-- <el-button link type="primary" size="large"
-											@click="closeTask(scope.row.id)">Close</el-button> -->
-								<!-- </template> -->
-							</el-table-column>
-						</el-table>
-					</el-card>
-				</el-col>
-			</el-row>
+			<div class="pt-1 w-full items-center">
+				<Splitter>
+					<template #content>
+						<component :is="currentView" />
+					</template>
+				
+				</Splitter>
+			</div>
 		</template>
-	</authenticator>
+	</Authenticator>
 </template>
 
-
-
 <style lang="scss">
-[data-amplify-authenticator] {
-	--amplify-components-authenticator-router-box-shadow: 0 0 16px var(--amplify-colors-overlay-10);
-	--amplify-components-authenticator-router-border-width: 0;
-	--amplify-components-authenticator-form-padding: var(--amplify-space-medium) var(--amplify-space-xl) var(--amplify-space-xl);
-	--amplify-components-button-primary-background-color: var(--amplify-colors-neutral-100);
-	--amplify-components-fieldcontrol-focus-box-shadow: 0 0 0 2px var(--amplify-colors-purple-60);
-	--amplify-components-tabs-item-active-border-color: var(--amplify-colors-neutral-100);
-	--amplify-components-tabs-item-color: var(--amplify-colors-neutral-80);
-	--amplify-components-tabs-item-active-color: var(--amplify-colors-purple-100);
-	--amplify-components-button-link-color: var(--amplify-colors-purple-80);
-}
+	[data-amplify-authenticator] {
+		--amplify-components-authenticator-router-box-shadow: 0 0 16px var(--amplify-colors-overlay-10);
+		--amplify-components-authenticator-router-border-width: 0;
+		--amplify-components-authenticator-form-padding: var(--amplify-space-medium) var(--amplify-space-xl) var(--amplify-space-xl);
+		--amplify-components-button-primary-background-color: var(--amplify-colors-neutral-100);
+		--amplify-components-fieldcontrol-focus-box-shadow: 0 0 0 2px var(--amplify-colors-purple-60);
+		--amplify-components-tabs-item-active-border-color: var(--amplify-colors-neutral-100);
+		--amplify-components-tabs-item-color: var(--amplify-colors-neutral-80);
+		--amplify-components-tabs-item-active-color: var(--amplify-colors-purple-100);
+		--amplify-components-button-link-color: var(--amplify-colors-purple-80);
+	}
 
-.flex-grow {
-	flex-grow: 1;
-}
+	.flex-grow {
+		flex-grow: 1;
+	}
 </style>

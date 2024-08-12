@@ -1,0 +1,18 @@
+button {
+  all: unset;
+}
+
+.SplitterPanel {
+  background-image: linear-gradient(to bottom right, hsl(173, 80.0%, 36.0%) 0%, hsl(151, 55.0%, 41.5%) 100%);  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} 
+
+.SplitterResizeHandle[data-orientation="horizontal"] {
+  width: 0.5rem
+}
+
+.SplitterResizeHandle[data-orientation="vertical"] {
+  height: 0.5rem
+}
