@@ -129,7 +129,7 @@ Resources:
             TargetOriginId: api
             ViewerProtocolPolicy: redirect-to-https
         ViewerCertificate:
-          AcmCertificateArn: arn:aws:acm:us-east-1:794415756724:certificate/8f3790a6-6e68-4d6e-9717-2b579a1a1fdd
+          AcmCertificateArn: arn:aws:acm:us-east-1:794415756724:certificate/d484e541-2c56-41ea-b582-1c17b415b0fd
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
   CloudFrontDNSRecord:  # new
