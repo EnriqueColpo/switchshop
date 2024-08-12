@@ -133,3 +133,18 @@ Resources:
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
   CloudFrontDNSRecord:  # new
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt SwitchCloudFront.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2  # See docs for more details https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
+      HostedZoneId:
+        Ref: SwitchHostedZone
+      Name:
+        Ref: Domain
+      Type: A
+Outputs:
+  HostedZoneId:
+    Description: Hosted zone ID
+    Value:
+      Ref: SwitchHostedZone
