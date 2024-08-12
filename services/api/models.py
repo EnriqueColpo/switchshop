@@ -1,9 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
-from typing import List, Optional
-from uuid import UUID
-
-from pydantic import BaseModel
+from typing import List
 
 
 @dataclass
