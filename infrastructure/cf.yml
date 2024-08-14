@@ -14,11 +14,11 @@ Resources:
         HostedZoneConfig
       Name:
         Ref: Domain
-    CloudFrontOriginAccessIdentity:
-      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-      Properties:
-        CloudFrontOriginAccessIdentityConfig:
-          Comment: "Switch UI"
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "Switch UI"
   VueAppS3Policy:
     Type: AWS::S3::BucketPolicy
     Properties:
