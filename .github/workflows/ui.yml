@@ -10,7 +10,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: eu-west-1
   APP_ENVIRONMENT: development
-  VITE_VUE_APP_API_URL: https://switchshop.world/api
+  VITE_VUE_APP_API_URL: https://switchshop.world/development/api
 
 jobs:
   deploy-development:
