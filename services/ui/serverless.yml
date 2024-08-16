@@ -31,10 +31,13 @@ resources:
       Properties:
         BucketName: ${self:custom.bucketName}
         PublicAccessBlockConfiguration:
-          BlockPublicAcls: false
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
         OwnershipControls:
           Rules:
-            - ObjectOwnership: ObjectWriter
+            - ObjectOwnership: BucketOwnerEnforced
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: error.html
