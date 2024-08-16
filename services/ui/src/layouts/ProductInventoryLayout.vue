@@ -11,7 +11,7 @@ const productInventory = reactive({ data: [] })
 const fetchProductInventory = async () => {
 	const configuration = await getConfiguration()
 	const response = await axios.get(
-		`${API_URL}/product_inventory?category_name=aaa`,
+		`${API_URL}/health-check`,
 		configuration
 	)
 	productInventory.data = response.data.results
