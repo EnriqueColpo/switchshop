@@ -1,5 +1,6 @@
 import os
 from typing import Union
+
 import jwt
 from fastapi import Depends, FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
