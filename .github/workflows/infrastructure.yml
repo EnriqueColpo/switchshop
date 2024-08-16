@@ -10,7 +10,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: eu-west-1
   APP_ENVIRONMENT: development
-  APP_DOMAIN: switchshop.world
+  APP_DOMAIN: https://switchshop.world
 
 jobs:
   apply:
