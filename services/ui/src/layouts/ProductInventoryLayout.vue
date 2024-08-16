@@ -10,11 +10,15 @@ const productInventory = reactive({ data: [] })
 
 const fetchProductInventory = async () => {
 	const configuration = await getConfiguration()
-	const response = await axios.get(
-		`${API_URL}/health-check`,
-		configuration
-	)
-	productInventory.data = response.data.results
+	try {
+		const response = await axios.get(
+			`${API_URL}/health-check`,
+			configuration
+		)
+		productInventory.data = response.data.results
+	} catch (error) {
+		console.log(error)
+	}
 }
 
 onMounted(() => {
