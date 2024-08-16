@@ -22,7 +22,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("ALLOWED_ORIGINS")],
+    allow_origins=["https://switchshop.world"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,7 +37,6 @@ def get_product_inventory_store():
 
 
 def get_user_email(Authorization: Union[bytes, None] = Header(default=None)) -> str:
-    print(Authorization)
     user_object = jwt.decode(Authorization, options={"verify_signature": False})
     return user_object["cognito:username"]
 
