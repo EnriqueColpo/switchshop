@@ -13,6 +13,7 @@ provider:
   environment:
     APP_ENVIRONMENT: ${self:provider.stage}
     TABLE_NAME: ${self:custom.tableName}
+    ALLOWED_ORIGINS: ${env:ALLOWED_ORIGINS}
   iam:
     role:
       statements:
