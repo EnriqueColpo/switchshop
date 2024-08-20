@@ -17,9 +17,7 @@ from schemas import (
 )
 from stores.product_inventory_store import ProductInventoryStore
 
-app = FastAPI(
-    roth_path="/api"
-)
+app = FastAPI(roth_path="/api")
 
 
 app.add_middleware(
