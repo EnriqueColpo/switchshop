@@ -45,6 +45,7 @@ def get_user_email(Authorization: Union[bytes, None] = Header(default=None)) -> 
 
 @app.get("/health-check/")
 def health_check():
+    print("test")
     return {"message": "OK"}
 
 
