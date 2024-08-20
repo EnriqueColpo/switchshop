@@ -17,7 +17,7 @@ from schemas import (
 )
 from stores.product_inventory_store import ProductInventoryStore
 
-app = FastAPI(roth_path="/api")
+app = FastAPI()
 
 
 app.add_middleware(
@@ -105,4 +105,4 @@ def get_product_inventory_list(
     return ProductInventoryListSchema(results=response)
 
 
-handle = Mangum(app, api_gateway_base_path="/api", lifespan="off")
+handle = Mangum(app)
