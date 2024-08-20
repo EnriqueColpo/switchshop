@@ -6,6 +6,7 @@ const getConfiguration = async () => {
 	const configuration = {
 		headers: {
 			Authorization: idToken.getJwtToken(),
+			'Access-Control-Allow-Origin': '*'
 		}
 	}
 

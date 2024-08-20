@@ -8,7 +8,7 @@ import CreateProductInventoryLayout from './layouts/CreateProductInventoryLayout
 import {ref, computed} from "vue"
 
 const routes: any = {
-	"/": ProductInventoryLayout,
+	"/home": ProductInventoryLayout,
 	"/crear-producto": CreateProductInventoryLayout
 }
 
