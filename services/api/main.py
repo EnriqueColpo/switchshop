@@ -17,7 +17,9 @@ from schemas import (
 )
 from stores.product_inventory_store import ProductInventoryStore
 
-app = FastAPI(roth_path="/api")
+app = FastAPI(
+    roth_path="/api"
+)
 
 
 app.add_middleware(
@@ -41,14 +43,14 @@ def get_user_email(Authorization: Union[bytes, None] = Header(default=None)) -> 
     return user_object["cognito:username"]
 
 
-@app.get("/health-check/")
+@app.get("/api/health-check/")
 def health_check():
     print("test")
     return {"message": "OK"}
 
 
 @app.post(
-    "/product_inventory/",
+    "/api/product_inventory/",
     response_model=ProductInventorySchema,
     status_code=status.HTTP_201_CREATED,
 )
@@ -75,7 +77,7 @@ def create_product_inventory(
 
 
 @app.get(
-    "/product_inventory/{product_inventory_id}/{location_id}",
+    "/api/product_inventory/{product_inventory_id}/{location_id}",
     response_model=ProductInventoryResponseSchema,
 )
 def get_product_inventory(
@@ -92,7 +94,7 @@ def get_product_inventory(
     return response
 
 
-@app.get("/product_inventory/", response_model=ProductInventoryListSchema)
+@app.get("/api/product_inventory/", response_model=ProductInventoryListSchema)
 def get_product_inventory_list(
     category_name: str = None,
     brand_name: str = None,
